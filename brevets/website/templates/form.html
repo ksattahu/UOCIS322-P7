@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>index</title>
+</head>
+<body>
+<h1> List all, open or close values in database. </h1>
+<form action="/list">
+    <label for="k">List k times (Will list all if out of range)</label>
+    <input type="text" id="k" name="k"><br><br>
+
+    <input type="checkbox" name="csv" id="csv"/>
+    <label for="csv">RETURN FORMAT: .csv, JSON otherwise.</label><br><br>
+
+    <button type="submit" name="list" value="listAll/">All</button>
+    <button type="submit" name="list" value="listOpenOnly/">Open</button>
+    <button type="submit" name="list" value="listCloseOnly/">Close</button>
+</form>
+</body>
+</html>

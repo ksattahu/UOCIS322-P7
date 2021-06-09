@@ -1,57 +1,38 @@
 # UOCIS322 - Project 7 #
-Adding authentication and user interface to brevet time calculator service
 
-## What is in this repository
+Brevet time calculator with MongoDB and RESTful api, with login functionality!
 
-You have a minimal implementation of password- and token-based authentication modules in `DockerAuth` directory, and login forms in `DockerLogin`, using which you can create authenticated REST API-based services (as demonstrated in class), as well as a front end. 
+## Author: Kale Satta-Hutton, ksattahu@uoregon.edu ##
 
-## IMPORTANT NOTES
+## Overview
 
-**MAKE SURE TO USE THE SOLUTION `acp_times.py` from Canvas for this project!**
+Implementation of the RUSA ACP controle time calculator with Flask and AJAX,
+Flask-WTForms, Flask-Login, and flak_RESTful with python MongoDB database manipulation.
 
-**MAKE SURE TO KEEP YOUR FILES in `brevets`! REMOVE `DockerRestAPI` after you're done!**
+### ACP controle times
 
-## Getting started 
+The algorithm for calculating controle times is described here [https://rusa.org/pages/acp-brevet-control-times-calculator](https://rusa.org/pages/acp-brevet-control-times-calculator). Additional background information is given here [https://rusa.org/pages/rulesForRiders](https://rusa.org/pages/rulesForRiders).
 
-You will reuse *your* code from Project 6.
+The algorithm does not account past 20% of each brevet, uses the French
+calculation for KM 0-60, each brevet has the same open and close time up to 20%
+past. Each specific brevet has a unique max, these are :(in hours and minutes, HH:MM)
+3:30 for 200 KM, 20:00 for 300 KM, 27:00 for 400 KM, 40:00 for 600 KM, and 75:00 for 1000 KM
+Each starting time is relative to the previous starting times, similar to the closing times.
 
-Recall: you created the following three parts: 
+acp_times.py provided by UOCIS322S21 resources, and project 3 implementation.
 
-* You designed RESTful services to expose what is stored in MongoDB, and created the following:
+Program now accepts valid inputs into a database. If the user attempts to submit an invalid
+value nothing will be added to the data base, and a message will be put on the index page.
+If the user displays from an empty database an error will be raised.
 
-** "http://<host:port>/listAll" should return all open and close times in the database
+This program also has a RESTful api service which allows the user to dictate what data
+will be returned back to them via a webpage.
 
-** "http://<host:port>/listOpenOnly" should return open times only
+docker-compose.yml file runs 3 separate containers and the MongoDB database.
 
-** "http://<host:port>/listCloseOnly" should return close times only
-
-* You also designed two different representations: one in csv and one in json. For the above, JSON should be your default representation. 
-
-** "http://<host:port>/listAll/csv" should return all open and close times in CSV format
-
-** "http://<host:port>/listOpenOnly/csv" should return open times only in CSV format
-
-** "http://<host:port>/listCloseOnly/csv" should return close times only in CSV format
-
-** "http://<host:port>/listAll/json" should return all open and close times in JSON format
-
-** "http://<host:port>/listOpenOnly/json" should return open times only in JSON format
-
-** "http://<host:port>/listCloseOnly/json" should return close times only in JSON format
-
-* You also added a query parameter to get top "k" open and close times. For examples, see below.
-
-** "http://<host:port>/listOpenOnly/csv?top=3" should return top 3 open times only (in ascending order) in CSV format 
-
-** "http://<host:port>/listOpenOnly/json?top=5" should return top 5 open times only (in ascending order) in JSON format
-
-* You'll also designed consumer programs (e.g., in jQuery) to expose the services.
-
-### Functionality you will add
-
-In this project, you will add the following functionalities:
-
-#### Part 1: Authenticating the services 
+If the top "k" value is out of range of the top times it displays all of the times.
+This includes negative and positive values. If k = 0 it displays nothing for all
+api access's.
 
 - POST **/register**
 
@@ -59,42 +40,14 @@ Registers a new user. On success a status code 201 is returned. The body of the 
 
 - GET **/token**
 
-Returns a token. This request must be authenticated using a HTTP Basic Authentication (see `DockerAuth/password.py` and `DockerAuth/testToken.py`). On success a JSON object is returned with a field `token` set to the authentication token for the user and a field `duration` set to the (approximate) number of seconds the token is valid. On failure status code 401 (unauthorized) is returned.
+Returns a token. This request must be authenticated using a HTTP Basic Authentication. On success a JSON object is returned with a field `token` set to the authentication token for the user and a field `duration` set to the (approximate) number of seconds the token is valid. On failure status code 401 (unauthorized) is returned.
 
-- GET **/RESOURCE-YOU-CREATED-IN-PROJECT-6**
+- GET **/RESOURCE**
 
-Return a protected <resource>, which is basically what you created in project 6. This request must be authenticated using token-based authentication only (see `DockerAuth/testToken.py`). HTTP password-based (basic) authentication is not allowed. On success a JSON object with data for the authenticated user is returned. On failure status code 401 (unauthorized) is returned.
+Return a protected <resource>, which is basically what you created in project 6. This request must be authenticated using token-based authentication only. HTTP password-based (basic) authentication is not allowed. On success a JSON object with data for the authenticated user is returned. On failure status code 401 (unauthorized) is returned.
 
-#### Part 2: User interface
+#
 
-The goal of this part of the project is to create frontend/UI for Brevet app using Flask-WTF and Flask-Login introduced in lectures. You frontend/UI should use the authentication that you created above. In addition to creating UI for basic authentication and token generation, you will add three additional functionalities in your UI: a) registration, b) login, c) remember me, d) logout.
+## Credits
 
-#### Summary
-You will still maintain your `brevetsapp` service, and `mongodb` service that you've had since project 5, that will remain UNCHANGED.
-
-## Tasks
-
-You'll turn in your credentials.ini using which we will get the following:
-
-* The working application with two parts.
-
-* Dockerfile
-
-* docker-compose.yml
-
-## Grading Rubric
-
-* If your code works as expected: 100 points. This includes:
-    * Basic APIs work as expected in part 1.
-    * Decent user interface in part 2 including the three functionalities in the UI.
-
-* For each non-working API in part 1, 15 points will be docked off. Part 1 carries 45 points.
-
-* For the UI and the three functionalies, decent UI carries 15 points. Each functionality carries 10 points. In short, part 2 carries 45 points.
-
-* If none of them work, you'll get 10 points assuming
-    * `README` is updated with your name and email ID.
-    * `credentials.ini` is submitted with the correct URL of your repo.
-    * `docker-compose.yml` works/builds without any errors.
-
-* If the `docker-compose.yml` doesn't build or if `credentials.ini` is missing, 0 will be assigned.
+Michal Young, Ram Durairajan, Steven Walton, Joe Istas.

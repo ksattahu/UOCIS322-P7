@@ -3,7 +3,7 @@
 <div class="row">
 	<h1>
 		{% if current_user.is_authenticated %}
-		Hi, {{ current_user.fullname }}!
+		Hi, {{ current_user.username }} you're signed in!
 		{% else %}
 		Hi stranger.
 		{% endif %}

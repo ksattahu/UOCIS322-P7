@@ -1,0 +1,7 @@
+arrow
+Flask==1.1.2
+pymongo
+nose
+flask-restful==0.3.8
+itsdangerous==0.24
+passlib==1.7.1

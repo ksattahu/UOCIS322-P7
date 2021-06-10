@@ -48,14 +48,10 @@ def is_safe_url(target):
 
 
 class User(UserMixin):
-    def __init__(self, id, username):
+    def __init__(self, id, username, token):
         self.id = id
         self.username = username
-        self.token = ""
-
-    def set_token(self, token):
         self.token = token
-        return self
 
 
 app = Flask(__name__)
@@ -79,7 +75,7 @@ login_manager.needs_refresh_message_category = "info"
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User(user_id, session["username"]).set_token(session["token"])
+    return User(user_id, session.get("username"), session.get("token"))
 
 
 login_manager.init_app(app)
@@ -99,11 +95,13 @@ def form():
 @app.route('/list')
 @login_required
 def list():
-    token = current_user.token
     data = request.args.get("csv", type=str, default="json")
     k = request.args.get("k", type=int, default=-1)
     list_ = request.args.get("list", type=str)
-    r = requests.get('http://restapi:5000/' + list_ + data + '?top=' + str(k) + '?token=' + token)
+    r = requests.get('http://restapi:5000/' + list_ + data + '?top=' + str(k) + '&token=' + session["token"])
+    if r.status_code == 401:
+        logout_user()
+        return render_template("index.html")
     return r.text
 
 
@@ -140,7 +138,7 @@ def login():
             remember = request.form.get("remember", "false") == "true"
             session["token"] = token["token"]
             session["username"] = username
-            u = User(token["id"], session["username"]).set_token(session["token"])
+            u = User(token["id"], session["username"], session["token"])
             if login_user(u, remember=remember):
                 flash("Logged in!")
                 flash("I'll remember you") if remember else None

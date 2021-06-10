@@ -44,7 +44,9 @@ Returns a token. This request must be authenticated using a HTTP Basic Authentic
 
 - GET **/RESOURCE**
 
-Return a protected <resource>, which is basically what you created in project 6. This request must be authenticated using token-based authentication only. HTTP password-based (basic) authentication is not allowed. On success a JSON object with data for the authenticated user is returned. On failure status code 401 (unauthorized) is returned.
+Return a protected <resource>. This request is authenticated by using token-based authentication only. On success a JSON object with data for the authenticated user is returned. On failure status code 401 (unauthorized) is returned.
+
+There is a maximum of 600 seconds for the user to be remembered by the session until it logs out and redirects the user to the index.
 
 #
 

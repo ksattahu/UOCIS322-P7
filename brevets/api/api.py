@@ -45,9 +45,8 @@ class register(Resource):
                     "password": password
                     }
             dbu.usersdb.insert_one(entry)
-            app.logger.debug(f"{dbu.usersdb.find_one({'username': username})}")
-            return Response(status=201)
-        return Response(status=400)
+            return {"message": "username is now registered!"}, 201
+        return {"message": "username already registered"}, 400
 
 
 class token(Resource):
@@ -62,46 +61,47 @@ class token(Resource):
                     "duration": duration
                     }
             return response, 201
-        return Response(status=401)
+        return {"message": "listOpenOnly request not verified"}, 401
 
 
 class listAll(Resource):
     def get(self, data="json"):
         token = request.args.get("token")
-        if not verify_auth_token(token):
-            return Response(status=401)
-        k = int(request.args.get("top", default=-1))
-        vals = list(db.vals.find({}, {'_id': 0, 'brevet_dist': 0, 'begin_date': 0, 'km': 0, 'miles': 0, 'location': 0}))
-        if data == "json":
-            return _json(k, vals)
-        else:
-            return _csv(k, vals)
+        if verify_auth_token(token):
+            k = int(request.args.get("top", default=-1))
+            vals = list(db.vals.find({}, {'_id': 0, 'brevet_dist': 0, 'begin_date': 0, 'km': 0, 'miles': 0, 'location': 0}))
+            if data == "json":
+                return _json(k, vals)
+            else:
+                return _csv(k, vals)
+        return {"message": "listAll request not verified"}, 401
 
 
 class listOpenOnly(Resource):
     def get(self, data="json"):
         token = request.args.get("token")
-        if not verify_auth_token(token):
-            return Response(status=401)
-        k = int(request.args.get("top", default=-1))
-        vals = list(db.vals.find({}, {'_id': 0, 'brevet_dist': 0, 'begin_date': 0, 'km': 0, 'miles': 0, 'location': 0, 'close_time': 0}))
-        if data == "json":
-            return _json(k, vals)
-        else:
-            return _csv(k, vals)
+        if verify_auth_token(token):
+            k = int(request.args.get("top", default=-1))
+            vals = list(db.vals.find({}, {'_id': 0, 'brevet_dist': 0, 'begin_date': 0, 'km': 0, 'miles': 0, 'location': 0, 'close_time': 0}))
+            if data == "json":
+                return _json(k, vals)
+            else:
+                return _csv(k, vals)
+        return {"message": "listOpenOnly request not verified"}, 401
 
 
 class listCloseOnly(Resource):
     def get(self, data="json"):
         token = request.args.get("token")
-        if not verify_auth_token(token):
-            return Response(status=401)
-        k = int(request.args.get("top", default=-1))
-        vals = list(db.vals.find({}, {'_id': 0, 'brevet_dist': 0, 'begin_date': 0, 'km': 0, 'miles': 0, 'location': 0, 'open_time': 0}))
-        if data == "json":
-            return _json(k, vals)
-        else:
-            return _csv(k, vals)
+        if verify_auth_token(token):
+            k = int(request.args.get("top", default=-1))
+            vals = list(db.vals.find({}, {'_id': 0, 'brevet_dist': 0, 'begin_date': 0, 'km': 0, 'miles': 0, 'location': 0, 'open_time': 0}))
+            if data == "json":
+                return _json(k, vals)
+            else:
+                return _csv(k, vals)
+        return {"message": "listCloseOnly request not verified"}, 401
+
 
 def _json(k, vals):
     if k >= 0 and k <= len(vals):
